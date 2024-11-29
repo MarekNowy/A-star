@@ -1,3 +1,5 @@
+// tu jest zmiana
+
 let div = document.getElementById("left-panel")
 
 div.addEventListener("click", function(event){
