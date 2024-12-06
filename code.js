@@ -1,58 +1,139 @@
-// tu jest zmiana
 
-let div = document.getElementById("left-panel")
+const board = document.getElementById("left-panel")
 
-div.addEventListener("click", function(event){
-    if(event.target.className != "start" && event.target.className != "stop" && event.target.id != "left-panel"){
+
+
+const height = 14;
+
+const width = 17;
+
+
+for(let x = 0; x < height; x++)
+{
+
+for (let i = 0; i < width; i++) 
+
+{
+
+const newDiv = document.createElement('div');
+newDiv.classList.add("box");
+board.appendChild(newDiv);
+
+}
+
+emptyDiv = document.createElement("div")
+emptyDiv.classList.add("empty")
+board.appendChild(emptyDiv)
+
+}
+
+
+
+function selectObsticles()
+{
+    $(board).off()
+
+
+$(board).on("click", function(event){
+    if(event.target.className == "box")
+    {
+    event.target.classList.add("new") 
     event.target.classList.remove("box")
-    event.target.classList.add("new")  
+     
+
     }
 })
 
-div.addEventListener("dblclick", function(event){
-    if(event.target.className != "start" && event.target.className != "stop" && event.target.id != "left-panel"){
-    event.target.classList.remove("new")
-    event.target.classList.add("box")  
-    }
-})
+}
+
+function selectDestinations()
+{
+    $(board).off()
+
+
+    $(board).on("click", function(event){
+      if(event.target.className == "box")
+      {
+
+      event.target.classList.add("start")
+      event.target.classList.remove("box")
+
+
+      }
+  })
+  
+  
+  $(board).on("dblclick", function(event)
+  {
+      if( event.target.className == "start")
+      {
+
+      event.target.classList.add("stop")  
+      event.target.classList.remove("start")
+     
+
+
+      }
+  })
+}
+  
+  function removeMark()
+  {
+    $("#left-panel").off()
+    $(board).on("click", function(event)
+    {
+      if(event.target.className != "box" && event.target.id != "left-panel")
+      {
+
+      let defaultClass = event.target.className
+      event.target.classList.add("box")
+      event.target.classList.remove(defaultClass)
+       
+      }
+  })
+  }
 
 let result = [];
 
+
 function startA()
-{
+{       
         document.getElementById("start").disabled = true;
-     
         const grid = [];
-        let columns = document.querySelectorAll("#left-panel > div");
-        columns.forEach((column) => {
-            let tab = [];
-            column.querySelectorAll(".box, .new, .start , .stop").forEach((div) => {
-                if(div.className == "start") tab.push("S")
-                else if(div.className == "stop") tab.push("E")
-                else if(div.className == "box") tab.push(".")
-                else  tab.push("x")
-            })
-            grid.push(tab)
-            
-        })
-     
-
         let tab = [];
-
-        for(let i = 0; i<grid.length; i++)
-        {
-            
-            for(let z = 0; z<grid.length; z++)
+        let columns = document.querySelectorAll("#left-panel > div");
+        columns.forEach((div) => {
+            if(tab.length<width)
             {
-              tab.push(grid[z][i])
-              
+            if(div.className != "empty")
+            {
+                if(div.className == "start")
+                    tab.push("S")
+                    else if(div.className == "stop") tab.push("E")
+                    else if(div.className == "box") tab.push(".")
+                    else  tab.push("x")
             }
-            result.push(tab)
-            tab = [];
         }
+        else
+        {
+            grid.push(tab)
+            tab = [];
+            if(div.className != "empty")
+                {
+                    if(div.className == "start")
+                        tab.push("S")
+                        else if(div.className == "stop") tab.push("E")
+                        else if(div.className == "box") tab.push(".")
+                        else  tab.push("x")
+                }
+        }
+        })
+        console.log(grid)
+        
         
 
-const arr = result;
+
+const arr = grid;
 
 let start = []
 let stop = []
@@ -155,7 +236,7 @@ if(up >= 0 && arr[up][location[1]] != "x" && notInCloseList(upperLocation) && no
     openList.push(upperLocation);
     
 }
-if(down < 10 && arr[down][location[1]] != "x" && notInCloseList(bottomLocation) && notInOpenList(bottomLocation)) 
+if(down < height && arr[down][location[1]] != "x" && notInCloseList(bottomLocation) && notInOpenList(bottomLocation)) 
 {
     openList.push(bottomLocation);
   
@@ -165,7 +246,7 @@ if(left >= 0 && arr[location[0]][left] != "x" && notInCloseList(leftLocation) &&
     openList.push(leftLocation);
    
 }
-if(right < 10 && arr[location[0]][right] != "x" && notInCloseList(rightLocation) && notInOpenList(rightLocation)) 
+if(right < width && arr[location[0]][right] != "x" && notInCloseList(rightLocation) && notInOpenList(rightLocation)) 
 {  
     openList.push(rightLocation);
    
@@ -193,7 +274,7 @@ function showPath() {
         );
     }
     path.push(start)
-    
+    console.log(path)
     return path; 
 }
 function A_Star()
@@ -217,7 +298,7 @@ function graficShow()
 {
     for(let i = 0; i < arr.length; i++)
     {
-        for(let z = 0; z < arr.length; z++)
+        for(let z = 0; z < arr[i].length; z++)
         {
             if(path.some((item) => item[0]==i && item[1]==z)) arr[i][z] = "P"
         }
@@ -230,7 +311,7 @@ for(let i = 0; i<arr.length; i++)
         for(let z = 0; z<arr[i].length; z++)
         {
 
-            if(arr[z][i] === "P" && !allDiv[counter].classList.contains("start") && !allDiv[counter].classList.contains("stop"))
+            if(arr[i][z] === "P" && !allDiv[counter].classList.contains("start") && !allDiv[counter].classList.contains("stop"))
             {
                 allDiv[counter].classList.add("path")
                 allDiv[counter].classList.remove("box")
