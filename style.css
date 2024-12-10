@@ -42,6 +42,7 @@ body
 }
 #start
 {
+    margin-top: 20px;
     background-color: orange;
     text-decoration: none;
     font-size: 25px;
@@ -115,4 +116,28 @@ body
     text-decoration: none;
     font-size: 25px;
 
+}
+input
+{
+    background-color: orange;
+  
+}
+input::placeholder
+{
+ color: black;
+}
+input::-webkit-inner-spin-button
+{
+    -webkit-appearance: none;
+}
+input:focus
+{
+    outline: none;
+}
+
+#submit
+{
+ background-color: orange;
+ text-decoration: none;
+ margin-top: 10px;
 }

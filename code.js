@@ -1,11 +1,31 @@
 
 const board = document.getElementById("left-panel")
+const startBtn = document.getElementById("start")
+const reloadBtn= document.getElementById("more")
+const selectDestinationsBtn = document.getElementById("selectDestinations")
+const selectObsticlesBtn = document.getElementById("selectObsticles")
+const removeMarkBtn = document.getElementById("removeMark")
+const createBoardBtn = document.getElementById("submit")
+
+$(startBtn).on("click", startA)
+$(reloadBtn).on("click", () => {location.reload()})
+$(selectDestinationsBtn).on("click",selectDestinations)
+$(selectObsticlesBtn).on("click", selectObsticles)
+$(removeMarkBtn).on("click",removeMark)
+$(createBoardBtn).on("click",function(event) {event.preventDefault(); createBoard()})
 
 
+let height = null;
+let width = null;
 
-const height = 14;
+function createBoard(){
+const he = Math.min(document.getElementById("height").value || 10, 100) || 10;
 
-const width = 17;
+
+const wi = Math.min(document.getElementById("width").value || 10, 100) || 10;
+
+height = he;
+width = wi;
 
 
 for(let x = 0; x < height; x++)
@@ -24,24 +44,24 @@ board.appendChild(newDiv);
 emptyDiv = document.createElement("div")
 emptyDiv.classList.add("empty")
 board.appendChild(emptyDiv)
+console.log("added empty div")
+
+}
 
 }
 
 
-
 function selectObsticles()
 {
-    $(board).off()
+   $(board).off()
 
 
-$(board).on("click", function(event){
+   $(board).on("click", function(event){
     if(event.target.className == "box")
-    {
-    event.target.classList.add("new") 
-    event.target.classList.remove("box")
-     
-
-    }
+       {
+        event.target.classList.add("new") 
+        event.target.classList.remove("box")
+       }
 })
 
 }
@@ -53,82 +73,86 @@ function selectDestinations()
 
     $(board).on("click", function(event){
       if(event.target.className == "box")
-      {
-
-      event.target.classList.add("start")
-      event.target.classList.remove("box")
-
-
-      }
+        {
+          event.target.classList.add("start")
+          event.target.classList.remove("box")
+        }
   })
   
   
-  $(board).on("dblclick", function(event)
+   $(board).on("dblclick", function(event)
   {
       if( event.target.className == "start")
       {
-
-      event.target.classList.add("stop")  
-      event.target.classList.remove("start")
-     
-
-
+        event.target.classList.add("stop")  
+        event.target.classList.remove("start")
       }
   })
 }
   
   function removeMark()
   {
-    $("#left-panel").off()
+    $(board).off()
     $(board).on("click", function(event)
     {
       if(event.target.className != "box" && event.target.id != "left-panel")
-      {
-
-      let defaultClass = event.target.className
-      event.target.classList.add("box")
-      event.target.classList.remove(defaultClass)
-       
-      }
+        {
+         let defaultClass = event.target.className
+         event.target.classList.add("box")
+         event.target.classList.remove(defaultClass)
+        }
   })
   }
 
-let result = [];
 
 
 function startA()
 {       
         document.getElementById("start").disabled = true;
-        const grid = [];
+        let grid = [];
         let tab = [];
         let columns = document.querySelectorAll("#left-panel > div");
+
         columns.forEach((div) => {
+  
             if(tab.length<width)
             {
-            if(div.className != "empty")
-            {
-                if(div.className == "start")
-                    tab.push("S")
-                    else if(div.className == "stop") tab.push("E")
-                    else if(div.className == "box") tab.push(".")
-                    else  tab.push("x")
-            }
+              if(div.className != "empty")
+               {              
+                if(div.className == "start"){
+                    tab.push("S")}
+
+                else if(div.className == "stop"){
+                    tab.push("E")} 
+                
+                else if(div.className == "box"){
+                    tab.push(".")} 
+                   
+                else  {
+                    tab.push("x")}
+               }
+              
+               
         }
         else
         {
+
             grid.push(tab)
             tab = [];
-            if(div.className != "empty")
+            if(div.className !== "empty")
                 {
-                    if(div.className == "start")
-                        tab.push("S")
-                        else if(div.className == "stop") tab.push("E")
-                        else if(div.className == "box") tab.push(".")
-                        else  tab.push("x")
+                    if(div.className == "start"){
+                        tab.push("S")}
+                    else if(div.className == "stop"){
+                        tab.push("E")} 
+                    else if(div.className == "box") {
+                        tab.push(".")}
+                    else {
+                        tab.push("x")} 
                 }
         }
         })
-        console.log(grid)
+      
         
         
 
@@ -140,6 +164,7 @@ let stop = []
 let openList = []
 let closeList = []
 let path = []
+
 
 
 
