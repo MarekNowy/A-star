@@ -23,12 +23,6 @@ body
     float: left;
 }
 
-
-.box:hover
-{
-    background-color: orange;
-}    
-
 #right-panel
 {
     
