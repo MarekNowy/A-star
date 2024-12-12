@@ -1,37 +1,71 @@
-
 const board = document.getElementById("left-panel");
 const startBtn = document.getElementById("start");
 const reloadBtn = document.getElementById("more");
-const selectDestinationsBtn = document.getElementById("selectDestinations");
+const selectStartBtn = document.getElementById("selectStart");
+const selectStopBtn = document.getElementById("selectStop");
 const selectObsticlesBtn = document.getElementById("selectObsticles");
 const removeMarkBtn = document.getElementById("removeMark");
 const createBoardBtn = document.getElementById("submit");
+const info = document.getElementById("info");
 
 $(startBtn).on("click",function(){
-    startBtn.disabled = true;
-   let arr = createArray()
-   console.log(arr)
-   startA(arr)
+    $(board).off();
+    selectObsticlesBtn.disabled = true;
+    removeMarkBtn.disabled = true;
+     startBtn.disabled = true;
+     let arr = createArray()
+     console.log(arr)
+     startA(arr)
 } );
 $(reloadBtn).on("click", () => { location.reload(); });
-$(selectDestinationsBtn).on("click", selectDestinations);
+$(selectStartBtn).on("click", MarkStart);
+$(selectStopBtn).on("click", MarkStop);
 $(selectObsticlesBtn).on("click", selectObsticles);
 $(removeMarkBtn).on("click", removeMark);
 $(createBoardBtn).on("click", function(event) { 
     event.preventDefault(); 
-    createBoardBtn.disabled = true;
     createBoard(); 
 });
 
 let height = null;
 let width = null;
 
-function createBoard() {
-    const he = Math.min(document.getElementById("height").value || 10, 100) || 10;
-    const wi = Math.min(document.getElementById("width").value || 10, 100) || 10;
+function AnyStartPoint(){
+ if(board.querySelector(".start") == null){
+    return true;
+ }
+ else {
+    selectStartBtn.disabled = true;
+    return false;
+ }
+}
 
-    height = he;
-    width = wi;
+function AnyEndPoint(){
+    if(board.querySelector(".stop") == null){
+       return true;
+    }
+    else {
+       selectStopBtn.disabled = true;
+       return false;
+    }
+   }
+
+function createBoard() {
+
+    const valid = /^(100|[2-9]|\d{2})$/
+    
+    if(valid.test(document.getElementById("height").value) && valid.test(document.getElementById("width").value))
+    {
+       createBoardBtn.disabled = true;
+       height = document.getElementById("height").value
+       width = document.getElementById("width").value
+       info.innerHTML = ''
+    }
+    else
+    {
+      info.innerHTML = "Niepoprawny wymiar tablicy. Podaj parametry w zakresie 2-100"
+    }
+    
 
     for (let x = 0; x < height; x++) {
         for (let i = 0; i < width; i++) {
@@ -57,31 +91,59 @@ function selectObsticles() {
     });
 }
 
-function selectDestinations() {
+function MarkStart() {
     $(board).off();
 
     $(board).on("click", function(event) {
-        if (event.target.className == "box") {
-            event.target.classList.add("start");
-            event.target.classList.remove("box");
-        }
-    });
+        if(AnyStartPoint())
+          {
+            if (event.target.className == "box") {
+                event.target.classList.add("start");
+                event.target.classList.remove("box");
+             }
+          }
+           
+       });
 
-    $(board).on("dblclick", function(event) {
-        if (event.target.className == "start") {
-            event.target.classList.add("stop");
-            event.target.classList.remove("start");
-        }
-    });
+
 }
+
+function MarkStop(){
+    $(board).off();
+    
+    $(board).on("click", function(event) {
+        if(AnyEndPoint())
+          {
+            if (event.target.className == "box") {
+                event.target.classList.add("stop");
+                event.target.classList.remove("box");
+             }
+          }
+           
+       });
+  
+}
+
 
 function removeMark() {
     $(board).off();
     $(board).on("click", function(event) {
-        if (event.target.className != "box" && event.target.id != "left-panel") {
+        if (event.target.className == "new" && event.target.id != "left-panel") {
             let defaultClass = event.target.className;
             event.target.classList.add("box");
             event.target.classList.remove(defaultClass);
+        }
+        else if(event.target.className == "start"){
+            let defaultClass = event.target.className;
+            event.target.classList.add("box");
+            event.target.classList.remove(defaultClass);
+            selectStartBtn.disabled = false;
+        }
+        else if(event.target.className == "stop"){
+            let defaultClass = event.target.className;
+            event.target.classList.add("box");
+            event.target.classList.remove(defaultClass);
+            selectStopBtn.disabled = false;
         }
     });
 }
@@ -285,6 +347,10 @@ function startA(arr) {
                 }
                 counter++;
             }
+        }
+        if(path.length == 2)
+        {
+            info.innerHTML = "Punkty znajdują się obok siebie"
         }
     }
 
