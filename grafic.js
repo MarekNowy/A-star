@@ -28,8 +28,6 @@ $(startBtn).on("click", function(event) {
         removeMarkBtn.disabled = true;
         startBtn.disabled = true;
         createArray();
-        array = JSON.stringify(array);
-        localStorage.setItem("arr", array);
         setArray();
         if(!A_Star()) {
             info.innerHTML = "brak ścieżki"
@@ -66,10 +64,6 @@ $(createBoardBtn).on("click", function(event) {
     createBoard();    
 });
 
-
-export function expFunc(value){
-    return value
-}
 
 function AnyStartPoint() {
     if (board.querySelector(".start") == null) {

@@ -1,3 +1,5 @@
+import { array } from "./grafic.js";
+
 let height = null;
 let width = null;
 let start = [];
@@ -9,8 +11,7 @@ export let arr = null;
 
 
 export function setArray() {
-    arr = localStorage.getItem("arr");
-    arr = JSON.parse(arr);
+    arr = array
     height = arr.length;
     width = arr[0].length;
 }
