@@ -1,3 +1,5 @@
+import { setArray,A_Star,showPath,arr,path } from "./logic.js";
+
 const board = document.getElementById("left-panel");
 const startBtn = document.getElementById("start");
 const reloadBtn = document.getElementById("more");
@@ -7,22 +9,29 @@ const selectObsticlesBtn = document.getElementById("selectObsticles");
 const removeMarkBtn = document.getElementById("removeMark");
 const createBoardBtn = document.getElementById("submit");
 const info = document.getElementById("info");
-const heightInput = document.getElementById("height");
-const widthInput = document.getElementById("width");
+
+const HEIGHT_ID_SELECTOR = "height";
+const WIDTH_ID_SELECTOR = "width";
+const START_ID_SELECTOR = "start";
+const STOP_ID_SELECTOR = "stop";
+const BOX_ID_SELECTOR = "box";
+const EMPTY_ID_SELECTOR = "empty";
+const PATH_ID_SELECTOR = "path";
+const NEW_ID_SELECTOR = "new";
+
+const VALID_REGEX = /^(100|[2-9]|\d{2})$/;
 
 let height = null;
 let width = null;
 
-$('button').prop('disabled', true);
+$("button").prop("disabled", true);
 createBoardBtn.disabled = false;
-
-import { setArray,A_Star,showPath,arr,path } from "./logic.js"
 
 export let array = null;
 
 $(startBtn).on("click", function(event) {
     if (!AnyStartPoint() && !AnyEndPoint()) {
-        info.innerHTML = ''
+        info.textContent = "";
         $(board).off();
         selectObsticlesBtn.disabled = true;
         removeMarkBtn.disabled = true;
@@ -30,43 +39,46 @@ $(startBtn).on("click", function(event) {
         createArray();
         setArray();
         if(!A_Star()) {
-            info.innerHTML = "brak ścieżki"
+            info.textContent = "brak ścieżki";
             return;
         }
- 
         changeArray(path);
         graficShow(path);
-    }
-     
-    else {
-        info.innerHTML = "nie zaznaczyles destynacji";
+    }   else {
+        info.textContent = "nie zaznaczyles destynacji";
     }
 });
 
-$(reloadBtn).on("click", () => { location.reload(); });
+$(reloadBtn).on("click", function() { location.reload(); });
 $(selectStartBtn).on("click", MarkStart);
 $(selectStopBtn).on("click", MarkStop);
 $(selectObsticlesBtn).on("click", selectObsticles);
 $(removeMarkBtn).on("click", removeMark);
 $(createBoardBtn).on("click", function(event) {
     event.preventDefault();
-    const valid = /^(100|[2-9]|\d{2})$/;
-    if(!valid.test(document.getElementById("height").value) || !valid.test(document.getElementById("width").value))
+    height = document.getElementById(HEIGHT_ID_SELECTOR).value;
+    width = document.getElementById(WIDTH_ID_SELECTOR).value;
+   if(!VALID_REGEX.test(height) || !VALID_REGEX.test(width))
     {
-        info.innerHTML = "Podaj parametry w zakresie 2-100"
+        info.textContent = "Podaj parametry w zakresie 2-100";
         return;
     }
-    $('button').prop('disabled', false);
+    $("button").prop("disabled", false);
     createBoardBtn.disabled = true;
-    height = document.getElementById("height").value;
-    width = document.getElementById("width").value;
-    info.innerHTML = '';
-    createBoard();    
+    info.textContent = "";
+    createBoard();
 });
 
+function changeIdToClassSelector(ids) {
+    if (typeof ids === "string"){
+        return "." + ids;
+    } if(typeof ids === "object") {
+        return ids.map((id) => `.${id}`).join(", ");
+    }
+}
 
 function AnyStartPoint() {
-    if (board.querySelector(".start") == null) {
+  if (board.querySelector(changeIdToClassSelector(START_ID_SELECTOR)) == null) {
         return true;
     } else {
         selectStartBtn.disabled = true;
@@ -75,7 +87,7 @@ function AnyStartPoint() {
 }
 
 function AnyEndPoint() {
-    if (board.querySelector(".stop") == null) {
+  if (board.querySelector(changeIdToClassSelector(STOP_ID_SELECTOR)) == null) {
         return true;
     } else {
         selectStopBtn.disabled = true;
@@ -83,28 +95,29 @@ function AnyEndPoint() {
     }
 }
 
-export function createBoard() {
+function createBoard(){
 
-    for (let x = 0; x < height; x++) {
+       for (let x = 0; x < height; x++) {
         for (let i = 0; i < width; i++) {
-            const newDiv = document.createElement('div');
-            newDiv.classList.add("box");
+            const newDiv = document.createElement("div");
+            newDiv.classList.add(BOX_ID_SELECTOR);
             board.appendChild(newDiv);
         }
 
         let emptyDiv = document.createElement("div");
-        emptyDiv.classList.add("empty");
+        emptyDiv.classList.add(EMPTY_ID_SELECTOR);
         board.appendChild(emptyDiv);
     }
+
 }
 
 function selectObsticles() {
     $(board).off();
 
     $(board).on("click", function(event) {
-        if (event.target.className == "box") {
-            event.target.classList.add("new");
-            event.target.classList.remove("box");
+        if (event.target.className == BOX_ID_SELECTOR) {
+            event.target.classList.add(NEW_ID_SELECTOR);
+            event.target.classList.remove(BOX_ID_SELECTOR);
         }
     });
 }
@@ -114,9 +127,9 @@ function MarkStart() {
 
     $(board).on("click", function(event) {
         if (AnyStartPoint()) {
-            if (event.target.className == "box") {
-                event.target.classList.add("start");
-                event.target.classList.remove("box");
+            if (event.target.className == BOX_ID_SELECTOR) {
+                event.target.classList.add(START_ID_SELECTOR);
+                event.target.classList.remove(BOX_ID_SELECTOR);
             }
         }
     });
@@ -127,30 +140,34 @@ function MarkStop() {
 
     $(board).on("click", function(event) {
         if (AnyEndPoint()) {
-            if (event.target.className == "box") {
-                event.target.classList.add("stop");
-                event.target.classList.remove("box");
+            if (event.target.className == BOX_ID_SELECTOR) {
+                event.target.classList.add(STOP_ID_SELECTOR);
+                event.target.classList.remove(BOX_ID_SELECTOR);
             }
         }
     });
 }
 
+function backToDefaultClass(event) {
+    let defaultClass = event.target.className;
+        event.target.classList.add(BOX_ID_SELECTOR);
+        event.target.classList.remove(defaultClass);
+}
+
 function removeMark() {
     $(board).off();
     $(board).on("click", function(event) {
-        if (event.target.className == "new" && event.target.id != "left-panel") {
-            let defaultClass = event.target.className;
-            event.target.classList.add("box");
-            event.target.classList.remove(defaultClass);
-        } else if (event.target.className == "start") {
-            let defaultClass = event.target.className;
-            event.target.classList.add("box");
-            event.target.classList.remove(defaultClass);
+    if (event.target.className == NEW_ID_SELECTOR && event.target.id != "left-panel") {
+
+            backToDefaultClass(event)
+
+        } else if (event.target.className == START_ID_SELECTOR) {
+
+            backToDefaultClass(event)
             selectStartBtn.disabled = false;
-        } else if (event.target.className == "stop") {
-            let defaultClass = event.target.className;
-            event.target.classList.add("box");
-            event.target.classList.remove(defaultClass);
+        } else if (event.target.className == STOP_ID_SELECTOR) {
+
+            backToDefaultClass(event)
             selectStopBtn.disabled = false;
         }
     });
@@ -163,12 +180,12 @@ function createArray() {
 
     columns.forEach((div) => {
         if (tab.length < width) {
-            if (div.className != "empty") {
-                if (div.className == "start") {
+            if (div.className != EMPTY_ID_SELECTOR) {
+                if (div.className == START_ID_SELECTOR) {
                     tab.push("S");
-                } else if (div.className == "stop") {
+                } else if (div.className == STOP_ID_SELECTOR) {
                     tab.push("E");
-                } else if (div.className == "box") {
+                } else if (div.className == BOX_ID_SELECTOR) {
                     tab.push(".");
                 } else {
                     tab.push("x");
@@ -177,12 +194,12 @@ function createArray() {
         } else {
             arr.push(tab);
             tab = [];
-            if (div.className !== "empty") {
-                if (div.className == "start") {
+            if (div.className !== EMPTY_ID_SELECTOR) {
+                if (div.className == START_ID_SELECTOR) {
                     tab.push("S");
-                } else if (div.className == "stop") {
+                } else if (div.className == STOP_ID_SELECTOR) {
                     tab.push("E");
-                } else if (div.className == "box") {
+                } else if (div.className == BOX_ID_SELECTOR) {
                     tab.push(".");
                 } else {
                     tab.push("x");
@@ -197,19 +214,21 @@ function createArray() {
 function changeArray(path) {
     for (let i = 0; i < arr.length; i++) {
         for (let z = 0; z < arr[i].length; z++) {
-            if (path.some((item) => item[0] == i && item[1] == z)) arr[i][z] = "P";
+        if (path.some((item) => item[0] == i && item[1] == z)) arr[i][z] = "P";
         }
     }
 }
 
 function graficShow(path) {
-    let allDiv = document.querySelectorAll(".box, .new, .start, .stop, .path");
+    let allDiv = document.querySelectorAll(changeIdToClassSelector([BOX_ID_SELECTOR,NEW_ID_SELECTOR,START_ID_SELECTOR,STOP_ID_SELECTOR,PATH_ID_SELECTOR]))
     let counter = 0;
     for (let i = 0; i < arr.length; i++) {
         for (let z = 0; z < arr[i].length; z++) {
-            if (arr[i][z] === "P" && !allDiv[counter].classList.contains("start") && !allDiv[counter].classList.contains("stop")) {
-                allDiv[counter].classList.add("path");
-                allDiv[counter].classList.remove("box");
+            let containStart = allDiv[counter].classList.contains(START_ID_SELECTOR)
+            let containStop = allDiv[counter].classList.contains(STOP_ID_SELECTOR);
+            if (arr[i][z] === "P" && !containStart && !containStop) {
+                allDiv[counter].classList.add(PATH_ID_SELECTOR);
+                allDiv[counter].classList.remove(BOX_ID_SELECTOR);
             }
             counter++;
         }
@@ -217,4 +236,4 @@ function graficShow(path) {
     if (path.length == 2) {
         info.innerHTML = "Punkty znajdują się obok siebie";
     }
-}
+};
